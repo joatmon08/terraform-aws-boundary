@@ -1,7 +1,8 @@
 # terraform-aws-boundary
 
-A Terraform module to deploy a cluster for testing
-[HashiCorp Boundary](https://www.boundaryproject.io/) on AWS.
+A Terraform module to deploy a Boundary cluster on AWS for testing and exploration.
+It uses the latest release of
+[HashiCorp Boundary](https://www.boundaryproject.io/) available for Linux.
 
 It uses AWS KMS and disables TLS. For the exact configuration,
 review the controller and worker configuration under
@@ -51,6 +52,7 @@ No modules.
 | [aws_security_group_rule.allow_9200](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) | resource |
 | [aws_security_group_rule.allow_9200_controller](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) | resource |
 | [aws_security_group_rule.allow_9201_controller](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) | resource |
+| [aws_security_group_rule.allow_9201_worker](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) | resource |
 | [aws_security_group_rule.allow_9202_worker](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) | resource |
 | [aws_security_group_rule.allow_controller_sg_to_db](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) | resource |
 | [aws_security_group_rule.allow_egress_controller](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/security_group_rule) | resource |
