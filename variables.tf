@@ -59,6 +59,12 @@ variable "allow_cidr_blocks_to_workers" {
   type        = list(string)
 }
 
+variable "enable_ssh_to_controller" {
+  description = "Enable SSH rule to controller"
+  type        = bool
+  default     = false
+}
+
 variable "additional_tags" {
   description = "List of tags for Boundary resources"
   default     = {}

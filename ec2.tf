@@ -85,6 +85,16 @@ resource "aws_security_group_rule" "allow_9201_controller" {
   security_group_id = aws_security_group.controller.id
 }
 
+resource "aws_security_group_rule" "allow_ssh_controller" {
+  count             = var.enable_ssh_to_controller ? 1 : 0
+  type              = "ingress"
+  from_port         = 22
+  to_port           = 22
+  protocol          = "tcp"
+  cidr_blocks       = var.allow_cidr_blocks_to_workers
+  security_group_id = aws_security_group.controller.id
+}
+
 resource "aws_security_group_rule" "allow_egress_controller" {
   type              = "egress"
   from_port         = 0
