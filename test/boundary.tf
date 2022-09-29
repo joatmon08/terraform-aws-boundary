@@ -18,4 +18,5 @@ module "boundary" {
   allow_cidr_blocks_to_workers = var.client_cidr_block
   allow_cidr_blocks_to_api     = ["0.0.0.0/0"] # Allow TFC to configure
   boundary_db_password         = random_password.boundary_database.result
+  datadog_api_key              = var.datadog_api_key
 }

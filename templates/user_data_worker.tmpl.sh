@@ -14,6 +14,12 @@ listener "tcp" {
   tls_disable = true
 }
 
+listener "tcp" {
+  address     = "$${PRIVATE_IP}:9203"
+  purpose     = "ops"
+  tls_disable = true
+}
+
 worker {
   name        = "${name}-worker-${index}"
   public_addr = "$${PUBLIC_IP}"
@@ -85,3 +91,46 @@ chmod 664 /etc/systemd/system/boundary.service
 systemctl daemon-reload
 systemctl enable boundary
 systemctl start boundary
+
+%{ if datadog_api_key != null }
+DD_INSTALL_ONLY=true DD_AGENT_MAJOR_VERSION=7 DD_API_KEY=${datadog_api_key} DD_SITE="datadoghq.com" bash -c "$(curl -L https://s3.amazonaws.com/dd-agent/scripts/install_script.sh)"
+
+cat << EOF > /etc/datadog-agent/datadog.yaml
+api_key: "${datadog_api_key}"
+
+site: datadoghq.com
+
+tags:
+  - team:${name}
+  - component:boundary-worker
+
+cloud_provider_metadata:
+  - "aws"
+
+## @param logs_enabled - boolean - optional - default: false
+## Enable Datadog Agent log collection by setting logs_enabled to true.
+logs_enabled: true
+EOF
+
+cat << EOF > /etc/datadog-agent/conf.d/boundary.d/conf.yaml
+logs:
+  - type: file
+    path: "${boundary_sink_file_path}/${boundary_sink_file_name}"
+    service: "boundary-worker"
+    source: "boundary-audit"
+
+init_config:
+    service: boundary-worker
+
+instances:
+  - health_endpoint: http://$${PRIVATE_IP}:9203/health
+    openmetrics_endpoint: http://$${PRIVATE_IP}:9203/metrics
+EOF
+
+usermod -a -G boundary dd-agent
+chmod g+rwx ${boundary_sink_file_path}/${boundary_sink_file_name}
+
+systemctl daemon-reload
+systemctl enable datadog-agent
+systemctl start datadog-agent
+%{ endif }

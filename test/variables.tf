@@ -33,3 +33,9 @@ variable "tags" {
     Test = "terraform-aws-boundary"
   }
 }
+
+variable "datadog_api_key" {
+  description = "Datadog API Key for audit logging"
+  type        = string
+  sensitive   = true
+}

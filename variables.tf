@@ -94,3 +94,26 @@ variable "boundary_sink_file_name" {
   type        = string
   default     = "audit.log"
 }
+
+variable "datadog_api_key" {
+  description = "Datadog API Key for audit logging"
+  type        = string
+  sensitive   = true
+  default     = null
+}
+
+data "aws_ami" "ubuntu" {
+  most_recent = true
+
+  filter {
+    name   = "name"
+    values = ["ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*"]
+  }
+
+  filter {
+    name   = "virtualization-type"
+    values = ["hvm"]
+  }
+
+  owners = ["099720109477"] # Canonical
+}
