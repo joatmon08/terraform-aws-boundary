@@ -1,6 +1,6 @@
 locals {
   tags = merge(var.additional_tags, {
-    Name    = var.name,
+    Name    = "${var.name}-boundary",
     Module  = "terraform-aws-boundary",
     Purpose = "boundary"
   })
@@ -81,4 +81,16 @@ variable "boundary_db_password" {
   description = "Boundary database password"
   type        = string
   sensitive   = true
+}
+
+variable "boundary_sink_file_path" {
+  description = "File path for Boundary events sink"
+  type        = string
+  default     = "/var/log/boundary"
+}
+
+variable "boundary_sink_file_name" {
+  description = "File name for Boundary events sink"
+  type        = string
+  default     = "audit.log"
 }

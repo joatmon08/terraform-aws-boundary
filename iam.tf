@@ -1,5 +1,6 @@
 resource "aws_iam_role" "boundary" {
   name = var.name
+  path = "/${var.name}/"
 
   assume_role_policy = <<EOF
 {
@@ -26,7 +27,7 @@ resource "aws_iam_instance_profile" "boundary" {
 }
 
 resource "aws_iam_role_policy" "boundary" {
-  name = var.name
+  name = "${var.name}-boundary"
   role = aws_iam_role.boundary.id
 
   policy = <<EOF
@@ -48,6 +49,26 @@ resource "aws_iam_role_policy" "boundary" {
       "${aws_kms_key.recovery.arn}"
     ]
   }
+}
+EOF
+}
+
+resource "aws_iam_role_policy" "boundary_host_catalog" {
+  name = "${var.name}-host-catalog-plugin"
+  role = aws_iam_role.boundary.id
+
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": [
+        "ec2:DescribeInstances"
+      ],
+      "Effect": "Allow",
+      "Resource": "*"
+    }
+  ]
 }
 EOF
 }

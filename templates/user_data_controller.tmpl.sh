@@ -32,9 +32,9 @@ listener "tcp" {
 }
 
 listener "tcp" {
-  address              = "$${PRIVATE_IP}:9201"
-  purpose              = "cluster"
-  tls_disable          = true
+  address     = "$${PRIVATE_IP}:9201"
+  purpose     = "cluster"
+  tls_disable = true
 }
 
 kms "awskms" {
@@ -54,9 +54,34 @@ kms "awskms" {
   key_id     = "global_recovery"
   kms_key_id = "${kms_recovery_key_id}"
 }
+
+events {
+  audit_enabled        = true
+  observations_enabled = true
+  sysevents_enabled    = true
+
+  sink "stderr" {
+    name        = "all-events"
+    description = "All events sent to stderr"
+    event_types = ["*"]
+    format      = "cloudevents-json"
+  }
+
+  sink {
+    name        = "controller-audit-sink"
+    description = "Audit sent to a file"
+    event_types = ["audit"]
+    format      = "cloudevents-json"
+
+    file {
+      path      = "${boundary_sink_file_path}"
+      file_name = "${boundary_sink_file_name}"
+    }
+  }
+}
 EOF
 
-cat << EOF > /etc/systemd/system/boundary-controller.service
+cat << EOF > /etc/systemd/system/boundary.service
 [Unit]
 Description=Boundary Controller
 [Service]
@@ -64,7 +89,6 @@ ExecStart=/usr/bin/boundary server -config /etc/config.hcl
 User=boundary
 Group=boundary
 LimitMEMLOCK=infinity
-Capabilities=CAP_IPC_LOCK+ep
 CapabilityBoundingSet=CAP_SYSLOG CAP_IPC_LOCK
 [Install]
 WantedBy=multi-user.target
@@ -74,9 +98,16 @@ adduser --system --group boundary || true
 chown boundary:boundary /etc/config.hcl
 chown boundary:boundary /usr/bin/boundary
 
+mkfs -t xfs /dev/nvme1n1
+mkdir -p ${boundary_sink_file_path}
+mount /dev/nvme1n1 ${boundary_sink_file_path}
+
+chgrp boundary ${boundary_sink_file_path}
+chmod g+rwx ${boundary_sink_file_path}
+
 boundary database init -skip-auth-method-creation -skip-host-resources-creation -skip-scopes-creation -skip-target-creation -config /etc/config.hcl || true
 
-chmod 664 /etc/systemd/system/boundary-controller.service
+chmod 664 /etc/systemd/system/boundary.service
 systemctl daemon-reload
-systemctl enable boundary-controller
-systemctl start boundary-controller
+systemctl enable boundary
+systemctl start boundary

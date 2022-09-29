@@ -14,13 +14,19 @@ resource "aws_db_instance" "boundary" {
   db_subnet_group_name   = aws_db_subnet_group.boundary.name
   publicly_accessible    = false
 
-  tags = merge(local.tags, { Component = "database" })
+  tags = merge(local.tags, {
+    Name      = "${var.name}-boundary-database",
+    Component = "database"
+  })
 }
 
 resource "aws_security_group" "db" {
   vpc_id = var.vpc_id
 
-  tags = merge(local.tags, { Component = "database" })
+  tags = merge(local.tags, {
+    Name      = "${var.name}-boundary-database",
+    Component = "database"
+  })
 }
 
 resource "aws_security_group_rule" "allow_controller_sg_to_db" {
@@ -45,5 +51,8 @@ resource "aws_db_subnet_group" "boundary" {
   name       = "boundary"
   subnet_ids = var.private_subnet_ids
 
-  tags = merge(local.tags, { Component = "database" })
+  tags = merge(local.tags, {
+    Name      = "${var.name}-boundary-database",
+    Component = "database"
+  })
 }

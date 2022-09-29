@@ -17,3 +17,8 @@ output "boundary_security_group" {
   value       = aws_security_group.worker.id
   description = "Security group for Boundary worker"
 }
+
+output "boundary_sink_file" {
+  value       = "${var.boundary_sink_file_path}/${var.boundary_sink_file_name}"
+  description = "File path to audit log for Boundary events"
+}

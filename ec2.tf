@@ -24,14 +24,34 @@ resource "aws_instance" "worker" {
   vpc_security_group_ids      = [aws_security_group.worker.id]
   associate_public_ip_address = true
 
+  ebs_block_device {
+    delete_on_termination = true
+    device_name           = "/dev/sdf"
+    encrypted             = false
+
+    tags = merge(local.tags, {
+      Name      = "${var.name}-boundary-worker",
+      Component = "worker",
+      Purpose   = "boundary-audit-logs"
+    })
+
+    volume_size = 32
+    volume_type = "gp2"
+  }
+
   user_data = templatefile("${path.module}/templates/user_data_worker.tmpl.sh", {
-    name                   = var.name
-    index                  = count.index
-    controller_ips         = aws_instance.controller.*.private_ip
-    kms_worker_auth_key_id = aws_kms_key.worker_auth.id
+    name                    = var.name
+    index                   = count.index
+    controller_ips          = aws_instance.controller.*.private_ip
+    kms_worker_auth_key_id  = aws_kms_key.worker_auth.id
+    boundary_sink_file_path = var.boundary_sink_file_path
+    boundary_sink_file_name = var.boundary_sink_file_name
   })
 
-  tags = merge(local.tags, { Component = "worker" })
+  tags = merge(local.tags, {
+    Name      = "${var.name}-boundary-worker",
+    Component = "worker"
+  })
 
   depends_on = [aws_instance.controller]
 }
@@ -47,23 +67,48 @@ resource "aws_instance" "controller" {
   vpc_security_group_ids      = [aws_security_group.controller.id]
   associate_public_ip_address = true
 
+  ebs_block_device {
+    delete_on_termination = true
+    device_name           = "/dev/sdf"
+    encrypted             = false
+
+    tags = merge(local.tags, {
+      Name      = "${var.name}-boundary-controller",
+      Component = "controller"
+      Purpose   = "boundary-audit-logs"
+    })
+
+    volume_size = 32
+    volume_type = "gp2"
+  }
+
+
   user_data = templatefile("${path.module}/templates/user_data_controller.tmpl.sh", {
-    name                   = var.name
-    index                  = count.index
-    db_username            = var.boundary_db_username
-    db_password            = var.boundary_db_password
-    db_endpoint            = aws_db_instance.boundary.endpoint
-    kms_worker_auth_key_id = aws_kms_key.worker_auth.id
-    kms_recovery_key_id    = aws_kms_key.recovery.id
-    kms_root_key_id        = aws_kms_key.root.id
+    name                    = var.name
+    index                   = count.index
+    db_username             = var.boundary_db_username
+    db_password             = var.boundary_db_password
+    db_endpoint             = aws_db_instance.boundary.endpoint
+    kms_worker_auth_key_id  = aws_kms_key.worker_auth.id
+    kms_recovery_key_id     = aws_kms_key.recovery.id
+    kms_root_key_id         = aws_kms_key.root.id
+    boundary_sink_file_path = var.boundary_sink_file_path
+    boundary_sink_file_name = var.boundary_sink_file_name
   })
-  tags = merge(local.tags, { Component = "controller" })
+
+  tags = merge(local.tags, {
+    Name      = "${var.name}-boundary-controller",
+    Component = "controller"
+  })
 }
 
 resource "aws_security_group" "controller" {
   vpc_id = var.vpc_id
 
-  tags = merge(local.tags, { Component = "controller" })
+  tags = merge(local.tags, {
+    Name      = "${var.name}-boundary-controller",
+    Component = "controller"
+  })
 }
 
 # Boundary API
@@ -107,7 +152,10 @@ resource "aws_security_group_rule" "allow_egress_controller" {
 resource "aws_security_group" "worker" {
   vpc_id = var.vpc_id
 
-  tags = merge(local.tags, { Component = "worker" })
+  tags = merge(local.tags, {
+    Name      = "${var.name}-boundary-worker",
+    Component = "worker"
+  })
 }
 
 resource "aws_security_group_rule" "allow_9201_worker" {
