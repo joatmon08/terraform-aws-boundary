@@ -74,6 +74,10 @@ events {
     event_types = ["audit"]
     format      = "cloudevents-json"
 
+    deny_filters = [
+      "\"/data/request_info/method\" contains \"ServerCoordinationService\""
+    ]
+
     file {
       path      = "${boundary_sink_file_path}"
       file_name = "${boundary_sink_file_name}"
