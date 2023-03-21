@@ -2,7 +2,7 @@ resource "aws_instance" "worker" {
   count                       = var.num_workers
   ami                         = data.aws_ami.ubuntu.id
   instance_type               = "t3.micro"
-  iam_instance_profile        = aws_iam_instance_profile.boundary.name
+  iam_instance_profile        = module.iam.iam_instance_profile.name
   subnet_id                   = var.public_subnet_ids[count.index]
   key_name                    = var.key_pair_name
   vpc_security_group_ids      = [aws_security_group.worker.id]

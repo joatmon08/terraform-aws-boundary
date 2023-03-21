@@ -1,34 +1,12 @@
-resource "aws_iam_role" "boundary" {
-  name = var.name
-  path = "/${var.name}/"
-
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": "sts:AssumeRole",
-      "Principal": {
-        "Service": "ec2.amazonaws.com"
-      },
-      "Effect": "Allow",
-      "Sid": ""
-    }
-  ]
-}
-EOF
-
-  tags = local.tags
-}
-
-resource "aws_iam_instance_profile" "boundary" {
-  name = var.name
-  role = aws_iam_role.boundary.name
+module "iam" {
+  source = "./modules/iam"
+  name   = var.name
+  tags   = local.tags
 }
 
 resource "aws_iam_role_policy" "boundary" {
   name = "${var.name}-boundary"
-  role = aws_iam_role.boundary.id
+  role = module.iam.iam_role.id
 
   policy = <<EOF
 {
@@ -55,7 +33,7 @@ EOF
 
 resource "aws_iam_role_policy" "boundary_host_catalog" {
   name = "${var.name}-host-catalog-plugin"
-  role = aws_iam_role.boundary.id
+  role = module.iam.iam_role.id
 
   policy = <<EOF
 {
