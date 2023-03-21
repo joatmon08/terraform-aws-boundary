@@ -40,3 +40,21 @@ variable "public_subnet_id" {
   description = "Public Subnet ID for instance"
   type        = string
 }
+
+variable "vault_addr" {
+  description = "Vault address for worker to write authentication token"
+  type        = string
+  default     = null
+}
+
+variable "vault_namespace" {
+  description = "Vault namespace for worker to write authentication token. For ENT or HCP"
+  type        = string
+  default     = "admin"
+}
+
+variable "vault_path" {
+  description = "Vault path for worker to write authentication token"
+  type        = string
+  default     = "/boundary"
+}

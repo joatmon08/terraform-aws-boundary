@@ -32,10 +32,13 @@ resource "aws_instance" "worker" {
   associate_public_ip_address = true
 
   user_data = templatefile("${path.module}/templates/user_data_worker.tmpl.sh", {
-    name                = var.name
+    name                = "${var.name}-ingress"
     boundary_cluster_id = var.boundary_cluster_id
-    initial_upstreams   = var.worker_upstreams
+    initial_upstreams   = jsonencode(var.worker_upstreams)
     worker_tags         = jsonencode(var.worker_tags)
+    vault_addr          = var.vault_addr
+    vault_namespace     = var.vault_namespace
+    vault_path          = var.vault_path
   })
 
   tags = var.tags

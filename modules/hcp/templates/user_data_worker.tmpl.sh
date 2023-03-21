@@ -7,7 +7,7 @@ apt-get update && sudo apt-get install boundary-worker-hcp -y
 PRIVATE_IP=$(curl -s http://169.254.169.254/latest/meta-data/local-ipv4)
 PUBLIC_IP=$(curl -s http://169.254.169.254/latest/meta-data/public-ipv4)
 
-mkdir -p /etc/boundary
+mkdir -p /etc/boundary/worker
 
 cat << EOF > /etc/boundary/config.hcl
 disable_mlock = true
@@ -22,7 +22,7 @@ listener "tcp" {
 worker {
   public_addr = "$${PUBLIC_IP}"
 %{ if initial_upstreams != null }
-  initial_upstreams = var.initial_upstreams
+  initial_upstreams = ${initial_upstreams}
 %{ endif }
   auth_storage_path = "/etc/boundary/worker"
   tags {
@@ -50,3 +50,11 @@ chmod 664 /etc/systemd/system/boundary.service
 systemctl daemon-reload
 systemctl enable boundary
 systemctl start boundary
+
+%{ if vault_addr != null }
+export VAULT_ADDR=${vault_addr}
+export VAULT_NAMESPACE=${vault_namespace}
+
+apt-get update && sudo apt-get install vault -y
+vault kv put -mount=${vault_path} ${name} token=$$(cat /etc/boundary/worker/auth_request_token)
+%{ endif }
