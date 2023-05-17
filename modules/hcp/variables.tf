@@ -58,3 +58,9 @@ variable "vault_path" {
   type        = string
   default     = "/boundary"
 }
+
+variable "vault_token" {
+  description = "Vault token for worker to write authentication token"
+  type        = string
+  sensitive   = true
+}

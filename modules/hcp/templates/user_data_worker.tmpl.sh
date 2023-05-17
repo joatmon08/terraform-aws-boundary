@@ -43,7 +43,7 @@ WantedBy=multi-user.target
 EOF
 
 adduser --system --group boundary || true
-chown boundary:boundary /etc/config.hcl
+chown boundary:boundary -R /etc/boundary
 chown boundary:boundary /usr/bin/boundary
 
 chmod 664 /etc/systemd/system/boundary.service
@@ -54,7 +54,8 @@ systemctl start boundary
 %{ if vault_addr != null }
 export VAULT_ADDR=${vault_addr}
 export VAULT_NAMESPACE=${vault_namespace}
+export VAULT_TOKEN=${vault_token}
 
 apt-get update && sudo apt-get install vault -y
-vault kv put -mount=${vault_path} ${name} token=$$(cat /etc/boundary/worker/auth_request_token)
+vault kv put -mount=${vault_path} $(hostname) token=$(cat /etc/boundary/worker/auth_request_token)
 %{ endif }

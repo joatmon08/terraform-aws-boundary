@@ -39,6 +39,7 @@ resource "aws_instance" "worker" {
     vault_addr          = var.vault_addr
     vault_namespace     = var.vault_namespace
     vault_path          = var.vault_path
+    vault_token         = var.vault_token
   })
 
   tags = var.tags
