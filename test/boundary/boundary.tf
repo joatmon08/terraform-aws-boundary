@@ -8,7 +8,7 @@ resource "random_password" "boundary_database" {
 
 module "boundary" {
   depends_on                   = [module.vpc]
-  source                       = "../"
+  source                       = "../.."
   vpc_id                       = module.vpc.vpc_id
   vpc_cidr_block               = module.vpc.vpc_cidr_block
   public_subnet_ids            = module.vpc.public_subnets

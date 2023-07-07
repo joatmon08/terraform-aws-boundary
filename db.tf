@@ -2,8 +2,8 @@ resource "aws_db_instance" "boundary" {
   allocated_storage   = 20
   storage_type        = "gp2"
   engine              = "postgres"
-  engine_version      = "11.12"
-  instance_class      = "db.t2.micro"
+  engine_version      = "14.8"
+  instance_class      = "db.t3.micro"
   db_name             = "boundary"
   username            = var.boundary_db_username
   password            = var.boundary_db_password
