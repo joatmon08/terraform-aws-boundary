@@ -9,7 +9,7 @@ resource "tls_private_key" "boundary" {
 
 module "boundary_worker" {
   depends_on          = [module.vpc]
-  source              = "../../modules/hcp"
+  source              = "../../../modules/hcp"
   name                = var.name
   boundary_cluster_id = split(".", replace(hcp_boundary_cluster.main.cluster_url, "https://", "", ))[0]
   worker_tags         = [var.name, "ingress"]
@@ -28,5 +28,5 @@ resource "aws_security_group_rule" "allow_9202_worker" {
   to_port           = 22
   protocol          = "tcp"
   cidr_blocks       = var.client_cidr_block
-  security_group_id = module.boundary_worker.security_group.id
+  security_group_id = module.boundary_worker.security_group_id
 }

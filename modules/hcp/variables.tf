@@ -64,3 +64,9 @@ variable "vault_token" {
   type        = string
   sensitive   = true
 }
+
+variable "worker_security_group_id" {
+  description = "Boundary worker security group ID. If null, module will create it"
+  type        = string
+  default     = null
+}
