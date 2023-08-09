@@ -11,6 +11,7 @@ output "kms_recovery_key_id" {
 output "boundary_controller" {
   value       = aws_instance.controller
   description = "Boundary controller attributes"
+  sensitive   = true
 }
 
 output "boundary_security_group" {
