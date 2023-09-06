@@ -44,7 +44,7 @@ resource "aws_instance" "worker" {
 
   tags = merge(var.tags, {
     Name = "${var.name}-boundary-worker"
-  }
+  })
 }
 
 resource "aws_security_group" "worker" {

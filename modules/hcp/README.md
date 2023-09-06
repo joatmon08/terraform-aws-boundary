@@ -8,13 +8,13 @@ Vault in order to register the worker's token into a key-value path.
 | Name | Version |
 |------|---------|
 | <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) | >=1.0 |
-| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >=4.32.0,<5.0 |
+| <a name="requirement_aws"></a> [aws](#requirement\_aws) | >=5.0 |
 
 ## Providers
 
 | Name | Version |
 |------|---------|
-| <a name="provider_aws"></a> [aws](#provider\_aws) | 4.59.0 |
+| <a name="provider_aws"></a> [aws](#provider\_aws) | 5.15.0 |
 
 ## Modules
 
@@ -46,6 +46,7 @@ Vault in order to register the worker's token into a key-value path.
 | <a name="input_vault_path"></a> [vault\_path](#input\_vault\_path) | Vault path for worker to write authentication token | `string` | `"/boundary"` | no |
 | <a name="input_vault_token"></a> [vault\_token](#input\_vault\_token) | Vault token for worker to write authentication token | `string` | n/a | yes |
 | <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id) | VPC ID for security group | `string` | n/a | yes |
+| <a name="input_worker_security_group_id"></a> [worker\_security\_group\_id](#input\_worker\_security\_group\_id) | Boundary worker security group ID. If null, module will create it | `string` | `null` | no |
 | <a name="input_worker_tags"></a> [worker\_tags](#input\_worker\_tags) | A list of worker tags for filtering in Boundary | `list(string)` | `[]` | no |
 | <a name="input_worker_upstreams"></a> [worker\_upstreams](#input\_worker\_upstreams) | A list of workers to connect to upstream. For multi-hop worker sessions. Format should be ["<upstream\_worker\_public\_addr>:9202"] | `list(string)` | `[]` | no |
 
@@ -53,5 +54,5 @@ Vault in order to register the worker's token into a key-value path.
 
 | Name | Description |
 |------|-------------|
-| <a name="output_security_group"></a> [security\_group](#output\_security\_group) | Security group for worker |
+| <a name="output_security_group_id"></a> [security\_group\_id](#output\_security\_group\_id) | Security group for worker |
 | <a name="output_worker"></a> [worker](#output\_worker) | Information about Boundary worker |
