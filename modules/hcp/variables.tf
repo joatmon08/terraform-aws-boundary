@@ -8,6 +8,18 @@ variable "boundary_cluster_id" {
   type        = string
 }
 
+variable "controller_generated_activation_token" {
+  description = "Boundary controller-generated activation token for worker"
+  type        = string
+  sensitive   = true
+}
+
+variable "boundary_scope_id" {
+  description = "Boundary scope ID for worker, defaults to global"
+  type        = string
+  default     = null
+}
+
 variable "worker_upstreams" {
   description = "A list of workers to connect to upstream. For multi-hop worker sessions. Format should be [\"<upstream_worker_public_addr>:9202\"]"
   type        = list(string)
@@ -41,32 +53,9 @@ variable "public_subnet_id" {
   type        = string
 }
 
-variable "vault_addr" {
-  description = "Vault address for worker to write authentication token"
-  type        = string
-  default     = null
-}
-
-variable "vault_namespace" {
-  description = "Vault namespace for worker to write authentication token. For ENT or HCP"
-  type        = string
-  default     = "admin"
-}
-
-variable "vault_path" {
-  description = "Vault path for worker to write authentication token"
-  type        = string
-  default     = "/boundary"
-}
-
-variable "vault_token" {
-  description = "Vault token for worker to write authentication token"
-  type        = string
-  sensitive   = true
-}
-
 variable "worker_security_group_id" {
   description = "Boundary worker security group ID. If null, module will create it"
   type        = string
   default     = null
 }
+

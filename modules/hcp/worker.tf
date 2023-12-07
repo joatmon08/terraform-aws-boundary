@@ -22,6 +22,12 @@ module "iam" {
   tags   = var.tags
 }
 
+resource "boundary_worker" "worker" {
+  scope_id    = var.boundary_scope_id
+  name        = var.name
+  description = "Self-managed worker using controller-led registration"
+}
+
 resource "aws_instance" "worker" {
   ami                         = data.aws_ami.ubuntu.id
   instance_type               = "t3.micro"
@@ -32,13 +38,10 @@ resource "aws_instance" "worker" {
   associate_public_ip_address = true
 
   user_data = templatefile("${path.module}/templates/user_data_worker.tmpl.sh", {
-    boundary_cluster_id = var.boundary_cluster_id
-    initial_upstreams   = jsonencode(var.worker_upstreams)
-    worker_tags         = jsonencode(var.worker_tags)
-    vault_addr          = var.vault_addr
-    vault_namespace     = var.vault_namespace
-    vault_path          = var.vault_path
-    vault_token         = var.vault_token
+    boundary_cluster_id                   = var.boundary_cluster_id
+    initial_upstreams                     = jsonencode(var.worker_upstreams)
+    worker_tags                           = jsonencode(var.worker_tags)
+    controller_generated_activation_token = boundary_worker.worker.controller_generated_activation_token
   })
 
   tags = merge(var.tags, {

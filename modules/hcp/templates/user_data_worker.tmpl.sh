@@ -25,6 +25,7 @@ worker {
   initial_upstreams = ${initial_upstreams}
 %{ endif }
   auth_storage_path = "/etc/boundary/worker"
+  controller_generated_activation_token = "${controller_generated_activation_token}
   tags {
     type = ${worker_tags}
   }
@@ -50,12 +51,3 @@ chmod 664 /etc/systemd/system/boundary.service
 systemctl daemon-reload
 systemctl enable boundary
 systemctl start boundary
-
-%{ if vault_addr != null }
-export VAULT_ADDR=${vault_addr}
-export VAULT_NAMESPACE=${vault_namespace}
-export VAULT_TOKEN=${vault_token}
-
-apt-get update && sudo apt-get install vault -y
-vault kv put -mount=${vault_path} $(hostname) token=$(cat /etc/boundary/worker/auth_request_token)
-%{ endif }
